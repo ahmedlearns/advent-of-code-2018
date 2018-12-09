@@ -5,20 +5,26 @@ var router = express.Router();
 
 function solution() {
   let sum = 0;  
-  var lineReader = require('readline').createInterface({
-    input: require('fs').createReadStream('input/one.txt')
-  });
-  lineReader.on('line', function (line) {
-    console.log('Line from file:', line);
-    console.log('parseInt: ', parseInt(line));
-    console.log('\n');
-    sum = sum + parseInt(line);
-    console.log(sum);
-  });
+  var lines = require('fs').readFileSync('input/one.txt', 'utf-8')
+    .split('\n')
+    .filter(Boolean);
 
-  lineReader.on('close', () => { return sum; });
+  let previousValues = {};
+  let foundRepeat = false;
+  while (!foundRepeat) {
+    lines.some((line) => {
+      sum = sum + parseInt(line);
+      if (previousValues[sum] != undefined) {
+        foundRepeat = true;
+        console.log('Found first repeat: ', previousValues[sum]);
+      } else {
+        previousValues[sum] = sum;
+      }
+      return foundRepeat;
+    });
+  }
+  return sum + '';
 }
-
 
 router.get('/', function(req, res, next) {
   res.send(solution());
